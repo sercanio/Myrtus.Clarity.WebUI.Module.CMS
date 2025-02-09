@@ -11,7 +11,7 @@ interface MediaTableViewProps {
   onSelect?: (url: string, alt: string) => void;
   onSelectCoverImage?: (url: string) => void;
   onDelete: (media: Media) => void;
-  onPreview: (media: Media) => void;
+  onPreview: (url: string) => void;
   onSort: (sorter: { field?: string; order?: 'ascend' | 'descend' }) => void;
 }
 

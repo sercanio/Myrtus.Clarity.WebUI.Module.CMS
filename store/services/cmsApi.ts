@@ -1,6 +1,6 @@
 // src/modules/cms/store/services/cmsApi.ts
 
-import { api as baseApi, ApiType } from '@store/api';
+import { api as baseApi } from '@store/api';
 // Import your types or define them here
 // e.g., Content, ContentDto, etc.
 
@@ -46,7 +46,9 @@ export interface PaginatedResponse<T> {
 }
 
 export interface Media {
+  url: string;
   id: string;
+  alt: string;
   fileName: string;
   blobUri: string;
   contentType: string;
@@ -111,7 +113,7 @@ let endpointsInjected = false;
  * The extended “slice” returned by `api.injectEndpoints(...)`.
  * We'll store it in a variable after injection.
  */
-let extendedApi: ApiType | null = null;
+let extendedApi: any = null;
 /**
  * Dynamically inject CMS endpoints into the baseApi.
  * Only called once to avoid duplicate injection errors.
@@ -224,7 +226,7 @@ export function addCmsEndpoints() {
           query: () => `SEO`,
           providesTags: ['SEO'],
         }),
-    
+
         updateSEOSettings: builder.mutation<SEOSettings, UpdateSEOSettingsDto>({
           query: (seoSettings) => ({
             url: `SEO`,
@@ -248,7 +250,7 @@ export function addCmsEndpoints() {
 export function getCmsHooks() {
   if (!extendedApi) {
     throw new Error(
-      'CMS endpoints have not been injected yet. ' + 
+      'CMS endpoints have not been injected yet. ' +
       'Make sure to call addCmsEndpoints() before using getCmsHooks()'
     );
   }
@@ -257,7 +259,7 @@ export function getCmsHooks() {
     useGetContentByIdQuery: extendedApi.useGetContentByIdQuery,
     useGetAllContentsQuery: extendedApi.useGetAllContentsQuery,
     useGetAllContentsDynamicQuery: extendedApi.useGetAllContentsDynamicQuery,
-    useCreateContentMutation: extendedApi.useCreateContentMutation, 
+    useCreateContentMutation: extendedApi.useCreateContentMutation,
     useUpdateContentMutation: extendedApi.useUpdateContentMutation,
     useDeleteContentMutation: extendedApi.useDeleteContentMutation,
     useRestoreContentVersionMutation: extendedApi.useRestoreContentVersionMutation,

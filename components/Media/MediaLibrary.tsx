@@ -23,11 +23,11 @@ import { setLoading } from '@src/store/slices/uiSlice';
 import type { DynamicQueryRequest, Media } from '@src/modules/cms/store/services/cmsApi';
 
 interface MediaLibraryProps {
-  onSelect?: (url: string, alt: string) => void;
+  onSelect?: (url: string, alt?: string) => void;
   onSelectCoverImage?: (url: string) => void;
 }
 
-const DEFAULT_SORT = [{ field: 'uploadedAt', dir: 'desc' }];
+const DEFAULT_SORT: { field: string; dir: 'desc' | 'asc' }[] = [{ field: 'uploadedAt', dir: 'desc' }];
 
 const MediaLibrary: React.FC<MediaLibraryProps> = ({ onSelect, onSelectCoverImage }) => {
   const {
@@ -57,7 +57,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onSelect, onSelectCoverImag
     requestBody: dynamicRequest,
   });
 
-  const messageApi = useContext(MessageContext);
+  const messageApi = useContext(MessageContext) || undefined;
   const [uploadMedia] = useUploadMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
   const dispatch = useDispatch();
@@ -67,7 +67,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onSelect, onSelectCoverImag
   const [isGridView, setIsGridView] = useState(true);
   const [altModalVisible, setAltModalVisible] = useState(false);
   const [selectedMediaUrl, setSelectedMediaUrl] = useState<string>('');
-  const [previewVisible, setPreviewVisible] = useState(false);
+  const [, setPreviewVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedDeleteMedia, setSelectedDeleteMedia] = useState<Media | null>(null);
 
@@ -93,11 +93,6 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onSelect, onSelectCoverImag
     messageApi?.error('Failed to delete media');
   };
 
-  const handleSelect = (url: string) => {
-    setSelectedMediaUrl(url);
-    setAltModalVisible(true);
-  };
-
   const handlePreview = (url: string) => {
     setSelectedMediaUrl(url);
     setPreviewVisible(true);
@@ -110,7 +105,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onSelect, onSelectCoverImag
   const searchTerm = ''; // Currently unused, can be connected to a search input if needed
 
   const filteredMediaList = mediaList.filter(
-    (m) =>
+    (m: any) =>
       m.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       m.uploadedBy.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -165,7 +160,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onSelect, onSelectCoverImag
                   ...prev,
                   sort: [
                     {
-                      field: sorter.field,
+                      field: sorter.field as string,
                       dir: sorter.order === 'ascend' ? 'asc' : 'desc',
                     },
                   ],

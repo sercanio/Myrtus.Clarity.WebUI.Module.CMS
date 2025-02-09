@@ -5,7 +5,7 @@ import type { Media } from '@src/modules/cms/store/services/cmsApi';
 
 interface MediaGridViewProps {
   mediaList: Media[];
-  onSelect?: (url: string) => void;
+  onSelect: ((url: string, alt?: string) => void) | undefined
   onSelectCoverImage?: (url: string) => void;
   onDelete: (media: Media) => void;
   onPreview: (url: string) => void;

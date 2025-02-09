@@ -11,8 +11,6 @@ import {
 import { getCmsHooks } from '@src/modules/cms/store/services/cmsApi';
 import { MessageContext } from '@src/contexts/MessageContext';
 
-const { Title } = Typography;
-
 interface SEOSettingsFormValues {
     DefaultMetaTitle: string;
     DefaultMetaDescription: string;

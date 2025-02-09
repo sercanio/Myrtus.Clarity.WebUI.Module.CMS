@@ -29,7 +29,7 @@ const ContentVersionsModal: React.FC<ContentVersionsModalProps> = ({
     >
       <List
         dataSource={content.versions}
-        renderItem={(version, index) => {
+        renderItem={(version: Version) => {
           const isCurrent = version.versionNumber === latestVersionNumber;
 
           return (

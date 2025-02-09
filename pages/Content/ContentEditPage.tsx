@@ -90,7 +90,7 @@ const ContentEditPage: React.FC = () => {
   /**
    * Insert in-body image
    */
-  const handleMediaSelect = (url: string, alt: string) => {
+  const handleMediaSelect = (url: string, alt?: string) => {
     setBody((prevBody) => `${prevBody}<img src="${url}" alt="${alt}" width="500" />`);
     setMediaLibraryVisible(false);
     setActiveTabKey('3'); // Switch to "Content" tab

@@ -9,7 +9,7 @@ import type { Media } from '@src/modules/cms/store/services/cmsApi';
 
 interface MediaActionsProps {
   media: Media;
-  onSelect?: (url: string) => void;
+  onSelect?: (url: string, alt: string) => void;
   onSelectCoverImage?: (url: string) => void;
   onDelete: (media: Media) => void;
 }
@@ -25,7 +25,7 @@ const MediaActions: React.FC<MediaActionsProps> = React.memo(({
       {onSelect && (
         <Button
           icon={<SelectOutlined />}
-          onClick={() => onSelect(media.blobUri)}
+          onClick={() => onSelect(media.blobUri, media.alt)}
           type="link"
           style={{ padding: 0 }}
         >

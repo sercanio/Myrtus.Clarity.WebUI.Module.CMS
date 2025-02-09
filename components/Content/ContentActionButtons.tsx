@@ -3,7 +3,8 @@ import { Button, Space } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 interface ActionButtonsProps {
-  onCreate: () => void;
+  onCreate?: () => void;
+  onSave?: () => void;
 }
 
 const ContentActionButtons: React.FC<ActionButtonsProps> = ({ onCreate }) => {

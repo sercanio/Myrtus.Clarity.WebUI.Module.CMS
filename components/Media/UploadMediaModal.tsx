@@ -1,17 +1,16 @@
-// UploadMediaModal.tsx
 import React, { useState } from 'react';
-import { Modal, Space, Upload, Button, Progress, Typography, message } from 'antd';
+import { Modal, Space, Upload, Button, Progress, Typography } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadRequestOption } from 'rc-upload/lib/interface';
-import type { UploadMediaMutation } from '@src/modules/cms/store/services/cmsApi';
-import type { MessageContextType } from '@contexts/MessageContext';
+import { MessageInstance } from 'antd/es/message/interface';
 
 interface UploadMediaModalProps {
   visible: boolean;
   onCancel: () => void;
   onSuccess: () => void;
-  uploadMedia: UploadMediaMutation;
-  messageApi?: MessageContextType;
+  uploadMedia: (formData: FormData) => Promise<string>;
+  messageApi?: MessageInstance;
+
 }
 
 const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
@@ -31,8 +30,8 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
     formData.append('file', file as File);
 
     // Validation
-    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-      messageApi?.error('Only image and video files are allowed.');
+    if (!(file as File).type.startsWith('image/') && !(file as File).type.startsWith('video/')) {
+      messageApi?.error?.('Only image and video files are allowed.');
       onError?.(new Error('Invalid file type'));
       return;
     }
@@ -53,7 +52,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
     }, 20);
 
     try {
-      await uploadMedia(formData).unwrap();
+      await uploadMedia(formData);
       clearInterval(simulateProgress);
       setUploadProgress(100);
       setTimeout(() => {

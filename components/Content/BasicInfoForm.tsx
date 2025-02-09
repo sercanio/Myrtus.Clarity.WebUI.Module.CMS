@@ -4,6 +4,7 @@ import { Form, Input, Select, Row, Col, Button } from 'antd';
 const { Option } = Select;
 
 interface BasicInfoFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: any; // Replace 'any' with the appropriate Form instance type if available
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   coverImageUrl?: string;
@@ -11,7 +12,6 @@ interface BasicInfoFormProps {
 }
 
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
-  form,
   onTitleChange,
   coverImageUrl,
   onOpenMediaLibrary,

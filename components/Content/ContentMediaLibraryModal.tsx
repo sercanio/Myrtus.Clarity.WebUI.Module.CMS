@@ -5,7 +5,7 @@ import MediaLibrary from '@src/modules/cms/components/Media/MediaLibrary';
 interface MediaLibraryModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (url: string, alt: string) => void;
+  onSelect: (url: string, alt?: string) => void;
   onSelectCoverImage: (url: string) => void;
 }
 

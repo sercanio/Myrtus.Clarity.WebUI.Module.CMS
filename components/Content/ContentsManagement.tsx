@@ -4,8 +4,6 @@ import {
   Card,
   Button,
   Space,
-  Grid,
-  Modal,
   Spin,
   Pagination,
 } from 'antd';
@@ -17,16 +15,14 @@ import { useNavigate } from 'react-router-dom';
 import { setLoading } from '@store/slices/uiSlice';
 import { getCmsHooks } from '@src/modules/cms/store/services/cmsApi';
 import { ContentSearchFilters } from './ContentSearchFilters';
-import FormattedDate from '@components/FormattedDate';
 import { MessageContext } from '@contexts/MessageContext';
 import ContentsTableView from './ContentsTableView';
 import ContentVersionsModal from './ContentsVersionModal';
 import ConfirmDeleteModal from '../Shared/ConfirmDeleteModal';
 
 const { Content } = Layout;
-const { useBreakpoint } = Grid;
 
-interface ContentEntity {
+export interface ContentEntity {
   id: string;
   title: string;
   slug: string;
@@ -39,7 +35,7 @@ interface ContentEntity {
   coverImageUrl?: string;
 }
 
-interface Version {
+export interface Version {
   versionNumber: number;
   title: string;
   body: string;
@@ -52,8 +48,6 @@ const ContentsManagement: React.FC = () => {
   const dispatch = useDispatch();
   const messageApi = useContext(MessageContext);
   const navigate = useNavigate();
-
-  const screens = useBreakpoint();
 
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -145,7 +139,7 @@ const ContentsManagement: React.FC = () => {
     if (sorter.field && sorter.order) {
       setDynamicRequest((prev) => ({
         ...prev,
-        sort: [{ field: sorter.field, dir: sorter.order === 'ascend' ? 'asc' : 'desc' }],
+        sort: [{ field: sorter.field as string, dir: sorter.order === 'ascend' ? 'asc' : 'desc' }],
       }));
     } else {
       setDynamicRequest((prev) => ({
@@ -175,7 +169,7 @@ const ContentsManagement: React.FC = () => {
           <ContentSearchFilters
             onRefresh={refetch}
             isLoading={isFetching}
-            onChange={(req) => {
+            onChange={(req: any) => {
               setDynamicRequest(req);
               setPageIndex(0);
             }}

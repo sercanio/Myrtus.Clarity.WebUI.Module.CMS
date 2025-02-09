@@ -5,8 +5,10 @@ import {
   DeleteOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
+import { Content } from '@srcmodules/cms/store/services/cmsApi';
 
 interface ContentActionsProps {
+  content: Content;
   onEdit: () => void;
   onDelete: () => void;
   onViewVersions: () => void;

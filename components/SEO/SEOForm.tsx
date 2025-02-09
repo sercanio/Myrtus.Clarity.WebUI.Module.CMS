@@ -7,7 +7,7 @@ interface SEOFormProps {
     form: any;
 }
 
-const SEOForm: React.FC<SEOFormProps> = ({ form }) => {
+const SEOForm: React.FC<SEOFormProps> = () => {
     return (
         <>
             <Row gutter={16}>

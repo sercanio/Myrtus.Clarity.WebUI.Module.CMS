@@ -1,9 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import {
-  Form, Card, Tabs, Modal, Spin,
-  Button,
-  theme,
-} from 'antd';
+import { Form, Card, Tabs, Button, theme, } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { MessageContext } from '@contexts/MessageContext';
 import { getCmsHooks } from '@src/modules/cms/store/services/cmsApi';
@@ -26,7 +22,7 @@ const ContentAddPage: React.FC = () => {
   const navigate = useNavigate();
   const [body, setBody] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  const [slugError, setSlugError] = useState<string | null>(null);
+  const [, setSlugError] = useState<string | null>(null);
   const [contentStyle, setContentStyle] = useState<string | null>(null);
 
   // Modal State
@@ -60,7 +56,7 @@ const ContentAddPage: React.FC = () => {
   /**
    * Handle media selection from MediaLibrary
    */
-  const handleMediaSelect = (url: string, alt: string) => {
+  const handleMediaSelect = (url: string, alt?: string) => {
     // Insert <img> in the body for inline images
     setBody((prevBody) => `${prevBody}<img src="${url}" alt="${alt}" width="500" />`);
     setMediaLibraryVisible(false);
