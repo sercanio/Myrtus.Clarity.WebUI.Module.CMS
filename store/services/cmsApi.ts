@@ -12,6 +12,7 @@ export interface ContentDto {
   tags: string[];
   status: string;
   language: string;
+  coverImageUrl?: string; // Added coverImageUrl
   metaTitle: string;
   metaDescription: string;
   metaKeywords: string[];
@@ -34,6 +35,75 @@ export interface Version {
   modifiedBy: string;
 }
 
+export interface PaginatedResponse<T> {
+  items: T[];
+  pageIndex: number;
+  pageSize: number;
+  totalPages: number;
+  totalCount: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface Media {
+  id: string;
+  fileName: string;
+  blobUri: string;
+  contentType: string;
+  size: number;
+  uploadedAt: string;
+  uploadedBy: string;
+}
+
+export interface UploadMediaRequest {
+  file: File;
+}
+
+export interface SEOSettings {
+  id: string;
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+  // Add other SEO-related fields as needed
+}
+
+export interface UpdateSEOSettingsDto {
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+  // Add other fields that can be updated
+}
+
+export interface DynamicSort {
+  field: string;
+  dir: 'asc' | 'desc';
+}
+
+export interface DynamicFilter {
+  field: string;
+  operator: string;       // e.g. 'contains', 'eq', 'startsWith', etc.
+  value: string;          // user-provided value
+  logic: string;          // 'string', 'number', 'date', etc.
+  isCaseSensitive: boolean;
+}
+
+export interface DynamicQueryRequest {
+  sort?: DynamicSort[];
+  filter?: DynamicFilter | null;
+}
+
+export interface DynamicMediaQueryArgs {
+  pageIndex: number;
+  pageSize: number;
+  requestBody: DynamicQueryRequest;
+}
+
+export interface DynamicContentQueryArgs {
+  pageIndex: number;
+  pageSize: number;
+  requestBody: DynamicQueryRequest;
+}
+
 // Keep track of whether we’ve injected endpoints before
 let endpointsInjected = false;
 
@@ -53,50 +123,118 @@ export function addCmsEndpoints() {
     extendedApi = baseApi.injectEndpoints({
       endpoints: (builder) => ({
         getContentById: builder.query<Content, string>({
-          query: (id) => `cms/${id}`,
+          query: (id) => `content/${id}`,
+          providesTags: (): [{ type: 'Contents' }] => [{ type: 'Contents' }],
+        }),
+
+        getAllContents: builder.query<PaginatedResponse<Content>, { pageIndex: number; pageSize: number }>({
+          query: ({ pageIndex, pageSize }) => ({
+            url: 'content',
+            params: { pageIndex, pageSize },
+          }),
           providesTags: ['Contents'],
         }),
 
-        getAllContents: builder.query<Content[], void>({
-          query: () => 'cms',
+        getAllContentsDynamic: builder.query<PaginatedResponse<Content>, DynamicContentQueryArgs>({
+          query: ({ pageIndex, pageSize, requestBody }) => ({
+            url: `content/dynamic?pageIndex=${pageIndex}&pageSize=${pageSize}`,
+            method: 'POST',
+            body: requestBody,
+          }),
           providesTags: ['Contents'],
         }),
 
         createContent: builder.mutation<Content, ContentDto>({
           query: (content) => ({
-            url: 'cms',
+            url: 'content',
             method: 'POST',
             body: content,
           }),
-          invalidatesTags: ['Contents'],
+          invalidatesTags: (): [{ type: 'Contents' }] => [{ type: 'Contents' }],
         }),
 
         updateContent: builder.mutation<void, { id: string; content: ContentDto }>({
           query: ({ id, content }) => ({
-            url: `cms/${id}`,
+            url: `content/${id}`,
             method: 'PUT',
             body: content,
           }),
-          invalidatesTags: ['Contents'],
+          invalidatesTags: (): [{ type: 'Contents' }] => [{ type: 'Contents' }],
         }),
 
         deleteContent: builder.mutation<void, string>({
           query: (id) => ({
-            url: `cms/${id}`,
+            url: `content/${id}`,
             method: 'DELETE',
           }),
-          invalidatesTags: ['Contents'],
+          invalidatesTags: (): [{ type: 'Contents' }] => [{ type: 'Contents' }],
         }),
 
         restoreContentVersion: builder.mutation<void, { id: string; versionNumber: number }>({
           query: ({ id, versionNumber }) => ({
-            url: `cms/${id}/restore/${versionNumber}`,
+            url: `content/${id}/restore/${versionNumber}`,
             method: 'POST',
           }),
           invalidatesTags: ['Contents'],
         }),
+
+        checkSlug: builder.mutation<{ exists: boolean }, { slug: string }>({
+          query: (slug) => ({
+            url: `content/slug/exists/${slug}`,
+            method: 'GET',
+          }),
+          invalidatesTags: ['Contents'],
+        }),
+
+        getAllMedia: builder.query<PaginatedResponse<Media>, { pageIndex: number; pageSize: number }>({
+          query: ({ pageIndex, pageSize }) => ({
+            url: 'media',
+            params: { pageIndex, pageSize },
+          }),
+          providesTags: ['Media'],
+        }),
+
+        getAllMediaDynamic: builder.query<PaginatedResponse<Media>, DynamicMediaQueryArgs>({
+          query: ({ pageIndex, pageSize, requestBody }) => ({
+            url: `media/dynamic?pageIndex=${pageIndex}&pageSize=${pageSize}`,
+            method: 'POST',
+            body: requestBody,
+          }),
+          providesTags: ['Media'],
+        }),
+
+        uploadMedia: builder.mutation<string, FormData>({
+          query: (formData) => ({
+            url: 'media/upload',
+            method: 'POST',
+            body: formData,
+          }),
+          invalidatesTags: ['Media'],
+        }),
+
+        deleteMedia: builder.mutation<void, string>({
+          query: (id) => ({
+            url: `media/${id}`,
+            method: 'DELETE',
+          }),
+          invalidatesTags: ['Media'],
+        }),
+
+        getSEOSettings: builder.query<SEOSettings, void>({
+          query: () => `SEO`,
+          providesTags: ['SEO'],
+        }),
+    
+        updateSEOSettings: builder.mutation<SEOSettings, UpdateSEOSettingsDto>({
+          query: (seoSettings) => ({
+            url: `SEO`,
+            method: 'PUT',
+            body: seoSettings,
+          }),
+          invalidatesTags: ['SEO'],
+        }),
       }),
-      overrideExisting: false, // ensure we don't overwrite existing endpoints
+      overrideExisting: false,
     });
   }
 
@@ -118,9 +256,17 @@ export function getCmsHooks() {
   return {
     useGetContentByIdQuery: extendedApi.useGetContentByIdQuery,
     useGetAllContentsQuery: extendedApi.useGetAllContentsQuery,
-    useCreateContentMutation: extendedApi.useCreateContentMutation,
+    useGetAllContentsDynamicQuery: extendedApi.useGetAllContentsDynamicQuery,
+    useCreateContentMutation: extendedApi.useCreateContentMutation, 
     useUpdateContentMutation: extendedApi.useUpdateContentMutation,
     useDeleteContentMutation: extendedApi.useDeleteContentMutation,
     useRestoreContentVersionMutation: extendedApi.useRestoreContentVersionMutation,
+    useCheckSlugMutation: extendedApi.useCheckSlugMutation,
+    useGetAllMediaQuery: extendedApi.useGetAllMediaQuery,
+    useGetAllMediaDynamicQuery: extendedApi.useGetAllMediaDynamicQuery,
+    useUploadMediaMutation: extendedApi.useUploadMediaMutation,
+    useDeleteMediaMutation: extendedApi.useDeleteMediaMutation,
+    useGetSEOSettingsQuery: extendedApi.useGetSEOSettingsQuery,
+    useUpdateSEOSettingsMutation: extendedApi.useUpdateSEOSettingsMutation
   };
 }
